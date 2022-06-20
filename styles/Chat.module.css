@@ -1,0 +1,54 @@
+.bigDiv {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    background-color: #BCF0EA;
+}
+.smallDiv {
+    background-color: #272D2D;
+    color: #FF985C;
+    width: max-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 50px;
+    padding: 30px;
+    border-radius: 25px;
+}
+.smallDiv button {
+    margin-top: 30px;
+    border: none;
+    margin-bottom: 10px;
+    width: max-content;
+    padding: 20px;
+    text-align: center;
+    border-radius: 100px;
+    font-size: 20px;
+    background-color: #5C95FF;
+}
+.dm,
+.servers {
+    width: 30%;
+    height: max-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #272D2D;
+    border-radius: 80px;
+}
+.bigDiv div div {
+    width: 80%;
+    height: 700px;
+}
+.dm > h1,
+.servers > h1 {
+    color: #FF985C;
+    font-size: 60px;
+    margin: 30px 0px;
+}
+.findDm {
+
+}
