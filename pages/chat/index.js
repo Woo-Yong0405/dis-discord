@@ -27,7 +27,7 @@ export default function chat() {
         return (
             <div className={i.bigDiv}>
                 <div className={i.smallDiv}>
-                    <h1>You're not logged in!</h1>
+                    <h1>You are not logged in!</h1>
                     <button onClick={() => {
                         Router.replace("/")
                     }}>Log In Here</button>
