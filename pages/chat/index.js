@@ -1,21 +1,35 @@
 import Router from "next/router";
+import { useState } from "react";
 import {v4 as uuidv4} from "uuid";
-import { authService } from "../../fb";
+import { authService, dbService, firebaseInstance } from "../../fb";
 import i from "../../styles/Chat.module.css";
 
 export default function chat() {
     if (authService.currentUser) {
+        const [newFriend, setNewFriend] = useState("")
         return (
             <div className={i.bigDiv}>
                 <div className={i.dm}>
                     <h1>Direct Messages:</h1>
                     <div className={i.findDm}>
                         <h1>Your ID: {authService.currentUser.uid}</h1>
-                        <form>
-                            <input type="text" placeholder="Friend's ID"/>
-                        </form>
-                        <button onClick={() => console.log(uuidv4())}>Find</button>
+                        <div className={i.newDiv}>
+                            <input type="text" placeholder="Friend's ID" onChange={e => setNewFriend(e.target.value)}/>
+                            <button onClick={() => {
+                                if (dbService.doc(`Users/${newFriend}`).id != undefined) {
+                                    dbService.doc(`Users/${authService.currentUser.uid}`).update({
+                                        dm: firebaseInstance.firestore.FieldValue.arrayUnion(newFriend)
+                                    })
+                                    dbService.doc(`Users/${newFriend}`).update({
+                                        dm: firebaseInstance.firestore.FieldValue.arrayUnion(authService.currentUser.uid)
+                                    })
+                                } else {
+                                    alert("User does not exist.")
+                                }
+                            }}>Find</button>
+                        </div>
                     </div>
+                    <div></div>
                 </div>
                 <div className={i.servers}>
                     <h1>Servers:</h1>
