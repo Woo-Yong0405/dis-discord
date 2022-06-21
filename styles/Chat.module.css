@@ -39,11 +39,6 @@
     background-color: #272D2D;
     border-radius: 80px;
 }
-.dm > :last-child,
-.servers :last-child {
-    width: 80%;
-    height: 700px;
-}
 .dm > h1,
 .servers > h1 {
     color: #FF985C;
@@ -80,8 +75,35 @@
 .newDiv button {
     width: 100px;
     height: 30px;
+    background-color: #5C95FF;
 }
 .findDm h1 {
     color: #FF985C;
     font-size: x-large;
+}
+.list {
+    width: 80%;
+    height: 600px;
+    margin-bottom: 30px;
+    margin-top: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
+    color: #272D2D;
+    background-color: #FF985C;
+    padding: 5%;
+    border-radius: 30px;
+    overflow: scroll;
+}
+.list div {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: black 1px solid;
+    margin-bottom: 20px;
+    font-size: 20px;
+    border-radius: 100px;
+    background-color: #272D2D;
+    color: #FF985C;
 }

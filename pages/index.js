@@ -27,6 +27,7 @@ export default function Home() {
                 dbService.doc(`Users/${authService.currentUser.uid}`).set({
                   dm: [],
                   server: [],
+                  nickname: authService.currentUser.displayName
                 })
                 router.replace("/chat")
               })

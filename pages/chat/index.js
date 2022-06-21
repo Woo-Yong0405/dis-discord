@@ -1,12 +1,40 @@
 import Router from "next/router";
-import { useState } from "react";
-import {v4 as uuidv4} from "uuid";
+import { useEffect, useState } from "react";
 import { authService, dbService, firebaseInstance } from "../../fb";
 import i from "../../styles/Chat.module.css";
 
 export default function chat() {
     if (authService.currentUser) {
         const [newFriend, setNewFriend] = useState("")
+        useEffect(() => {
+            dbService.doc(`Users/${authService.currentUser.uid}`).get().then(documenta => {
+                const dmList = documenta.data().dm
+                const friendList = document.getElementById("friendList");
+                dmList.forEach(inn => {
+                    const div = document.createElement("div");
+                    const p = document.createElement("p");
+                    const button = document.createElement("button");
+                    let nickname;
+                    dbService.doc(`Users/${inn}`).get().then(docca => {
+                        nickname = docca.data().nickname
+                        p.innerText = nickname;
+                    })
+                    div.append(p)
+                    button.innerText = "Delete Friend"
+                    button.className = i.deleteFriend
+                    button.addEventListener("click", () => {
+                        dbService.doc(`Users/${authService.currentUser.uid}`).update({
+                            dm: firebaseInstance.firestore.FieldValue.arrayRemove(inn)
+                        })
+                        dbService.doc(`Users/${inn}`).update({
+                            dm: firebaseInstance.firestore.FieldValue.arrayRemove(authService.currentUser.uid)
+                        })
+                    })
+                    div.append(button)
+                    friendList.append(div)
+                })
+            })
+        }, [])
         return (
             <div className={i.bigDiv}>
                 <div className={i.dm}>
@@ -16,24 +44,39 @@ export default function chat() {
                         <div className={i.newDiv}>
                             <input type="text" placeholder="Friend's ID" onChange={e => setNewFriend(e.target.value)}/>
                             <button onClick={() => {
-                                if (dbService.doc(`Users/${newFriend}`).id != undefined) {
-                                    dbService.doc(`Users/${authService.currentUser.uid}`).update({
-                                        dm: firebaseInstance.firestore.FieldValue.arrayUnion(newFriend)
+                                if (newFriend !== "") {
+                                    dbService.doc(`Users/${newFriend}`).onSnapshot(doc => {
+                                        if (doc.exists) {
+                                            if (newFriend != authService.currentUser.uid) {
+                                                dbService.doc(`Users/${authService.currentUser.uid}`).onSnapshot(doca => {
+                                                    const dmList = doca.data().dm;
+                                                    if (!dmList.includes(newFriend)) {
+                                                        dbService.doc(`Users/${authService.currentUser.uid}`).update({
+                                                            dm: firebaseInstance.firestore.FieldValue.arrayUnion(newFriend)
+                                                        })
+                                                        dbService.doc(`Users/${newFriend}`).update({
+                                                            dm: firebaseInstance.firestore.FieldValue.arrayUnion(authService.currentUser.uid)
+                                                        })
+                                                    } else {
+                                                        alert("Already on DM list.")
+                                                    }
+                                                })
+                                            } else {
+                                                alert("You can't friend yourself. Are you that lonely?")
+                                            }
+                                        } else {
+                                            alert("User does not exist.")
+                                        }
                                     })
-                                    dbService.doc(`Users/${newFriend}`).update({
-                                        dm: firebaseInstance.firestore.FieldValue.arrayUnion(authService.currentUser.uid)
-                                    })
-                                } else {
-                                    alert("User does not exist.")
                                 }
                             }}>Find</button>
                         </div>
                     </div>
-                    <div></div>
+                    <div id="friendList" className={i.list}></div>
                 </div>
                 <div className={i.servers}>
                     <h1>Servers:</h1>
-                    <div></div>
+                    <div className={i.list}></div>
                 </div>
             </div>
         )
