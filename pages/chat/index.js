@@ -14,6 +14,37 @@ export default function chat() {
                     const div = document.createElement("div");
                     const p = document.createElement("p");
                     const button = document.createElement("button");
+                    const button2 = document.createElement("button");
+                    button2.innerText = "Open Chat"
+                    let nickname;
+                    dbService.doc(`Users/${inn}`).get().then(docca => {
+                        nickname = docca.data().nickname
+                        p.innerText = nickname;
+                    })
+                    div.append(p)
+                    button.innerText = "Delete Friend"
+                    button.className = i.deleteFriend
+                    button.addEventListener("click", () => {
+                        dbService.doc(`Users/${authService.currentUser.uid}`).update({
+                            dm: firebaseInstance.firestore.FieldValue.arrayRemove(inn)
+                        })
+                        dbService.doc(`Users/${inn}`).update({
+                            dm: firebaseInstance.firestore.FieldValue.arrayRemove(authService.currentUser.uid)
+                        })
+                    })
+                    div.append(button2)
+                    div.append(button)
+                    friendList.append(div)
+                })
+            })
+            dbService.doc(`Users/${authService.currentUser.uid}`).onSnapshot(documenta => {
+                const dmList = documenta.data().dm
+                const friendList = document.getElementById("friendList");
+                friendList.innerHTML = "";
+                dmList.forEach(inn => {
+                    const div = document.createElement("div");
+                    const p = document.createElement("p");
+                    const button = document.createElement("button");
                     let nickname;
                     dbService.doc(`Users/${inn}`).get().then(docca => {
                         nickname = docca.data().nickname
@@ -45,10 +76,10 @@ export default function chat() {
                             <input type="text" placeholder="Friend's ID" onChange={e => setNewFriend(e.target.value)}/>
                             <button onClick={() => {
                                 if (newFriend !== "") {
-                                    dbService.doc(`Users/${newFriend}`).onSnapshot(doc => {
+                                    dbService.doc(`Users/${newFriend}`).get().then(doc => {
                                         if (doc.exists) {
                                             if (newFriend != authService.currentUser.uid) {
-                                                dbService.doc(`Users/${authService.currentUser.uid}`).onSnapshot(doca => {
+                                                dbService.doc(`Users/${authService.currentUser.uid}`).get().then(doca => {
                                                     const dmList = doca.data().dm;
                                                     if (!dmList.includes(newFriend)) {
                                                         dbService.doc(`Users/${authService.currentUser.uid}`).update({
