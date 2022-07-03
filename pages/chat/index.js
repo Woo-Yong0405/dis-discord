@@ -2,10 +2,14 @@ import Router from "next/router";
 import { useEffect, useState } from "react";
 import { authService, dbService, firebaseInstance } from "../../fb";
 import i from "../../styles/Chat.module.css";
+import {v4 as uuidv4} from "uuid"
 
 export default function chat() {
     if (authService.currentUser) {
-        const [newFriend, setNewFriend] = useState("")
+        const [newFriend, setNewFriend] = useState("");
+        const [nickname, setNickname] = useState("");
+        const [newServer, setNewServer] = useState("");
+        const [joinServer, setJoinServer] = useState("");
         useEffect(() => {
             dbService.doc(`Users/${authService.currentUser.uid}`).get().then(documenta => {
                 const dmList = documenta.data().dm
@@ -20,6 +24,9 @@ export default function chat() {
                     dbService.doc(`Users/${inn}`).get().then(docca => {
                         nickname = docca.data().nickname
                         p.innerText = nickname;
+                    })
+                    button2.addEventListener("click", () => {
+                        Router.push(`/chat/${inn}?type=dm&from=${authService.currentUser.uid}`)
                     })
                     div.append(p)
                     button.innerText = "Delete Friend"
@@ -45,10 +52,15 @@ export default function chat() {
                     const div = document.createElement("div");
                     const p = document.createElement("p");
                     const button = document.createElement("button");
+                    const button2 = document.createElement("button");
+                    button2.innerText = "Open Chat"
                     let nickname;
                     dbService.doc(`Users/${inn}`).get().then(docca => {
                         nickname = docca.data().nickname
                         p.innerText = nickname;
+                    })
+                    button2.addEventListener("click", () => {
+                        Router.push(`/chat/${inn}?type=dm&from=${authService.currentUser.uid}`)
                     })
                     div.append(p)
                     button.innerText = "Delete Friend"
@@ -61,6 +73,84 @@ export default function chat() {
                             dm: firebaseInstance.firestore.FieldValue.arrayRemove(authService.currentUser.uid)
                         })
                     })
+                    div.append(button2)
+                    div.append(button)
+                    friendList.append(div)
+                })
+            })
+            dbService.doc(`Users/${authService.currentUser.uid}`).get().then(documenta => {
+                const dmList = documenta.data().server
+                const friendList = document.getElementById("serverList");
+                dmList.forEach(inn => {
+                    const div = document.createElement("div");
+                    const p = document.createElement("p");
+                    const button = document.createElement("button");
+                    const button2 = document.createElement("button");
+                    button2.innerText = "Open Server"
+                    let nickname;
+                    dbService.doc(`Servers/${inn}`).get().then(docca => {
+                        nickname = docca.data().name
+                        p.innerText = nickname;
+                    })
+                    button2.addEventListener("click", () => {
+                        Router.push(`/chat/${inn}?type=server&from=${authService.currentUser.uid}`)
+                    })
+                    div.append(p)
+                    button.innerText = "Leave"
+                    button.className = i.deleteFriend
+                    button.addEventListener("click", () => {
+                        dbService.doc(`Users/${authService.currentUser.uid}`).update({
+                            server: firebaseInstance.firestore.FieldValue.arrayRemove(inn)
+                        })
+                        dbService.doc(`Servers/${inn}`).update({
+                            members: firebaseInstance.firestore.FieldValue.arrayRemove(authService.currentUser.uid)
+                        })
+                        dbService.doc(`Servers/${inn}`).get().then(doc => {
+                            const dmListList = doc.data().members
+                            if (dmListList.length == 0) {
+                                dbService.doc(`Servers/${inn}`).delete()
+                            }
+                        })
+                    })
+                    div.append(button2)
+                    div.append(button)
+                    friendList.append(div)
+                })
+            })
+            dbService.doc(`Users/${authService.currentUser.uid}`).onSnapshot(documenta => {
+                const dmList = documenta.data().server
+                const friendList = document.getElementById("serverList");
+                friendList.innerHTML = "";
+                dmList.forEach(inn => {
+                    const div = document.createElement("div");
+                    const p = document.createElement("p");
+                    const button = document.createElement("button");
+                    const button2 = document.createElement("button");
+                    button2.innerText = "Open Server"
+                    dbService.doc(`Servers/${inn}`).get().then(docca => {
+                        p.innerText = docca.data().name;
+                    })
+                    button2.addEventListener("click", () => {
+                        Router.push(`/chat/${inn}?type=server&from=${authService.currentUser.uid}`)
+                    })
+                    div.append(p)
+                    button.innerText = "Leave"
+                    button.className = i.deleteFriend
+                    button.addEventListener("click", () => {
+                        dbService.doc(`Users/${authService.currentUser.uid}`).update({
+                            server: firebaseInstance.firestore.FieldValue.arrayRemove(inn)
+                        })
+                        dbService.doc(`Servers/${inn}`).update({
+                            members: firebaseInstance.firestore.FieldValue.arrayRemove(authService.currentUser.uid)
+                        })
+                        dbService.doc(`Servers/${inn}`).get().then(doc => {
+                            const dmListList = doc.data().members
+                            if (dmListList.length == 0) {
+                                dbService.doc(`Servers/${inn}`).delete()
+                            }
+                        })
+                    })
+                    div.append(button2)
                     div.append(button)
                     friendList.append(div)
                 })
@@ -107,7 +197,49 @@ export default function chat() {
                 </div>
                 <div className={i.servers}>
                     <h1>Servers:</h1>
-                    <div className={i.list}></div>
+                    <h1>Change Nickname:</h1>
+                    <div className={i.fcServer}>
+                        <input type="text" placeholder="New Nickname" onChange={e => setNickname(e.target.value)} />
+                        <button onClick={() => {
+                            dbService.doc(`Users/${authService.currentUser.uid}`).update({
+                                nickname: nickname
+                            }).then(() => {
+                                alert("Nickname Changed Successfully to " + nickname)
+                            })
+                        }}>Change</button>
+                    </div>
+                    <h1>Join or Create Server:</h1>
+                    <div className={i.fcServer}>
+                        <input type="text" placeholder="Server Name" onChange={e => setNewServer(e.target.value)} />
+                        <button onClick={() => {
+                            const serverID = uuidv4();
+                            dbService.doc(`Servers/${serverID}`).set({
+                                members: [authService.currentUser.uid],
+                                name: newServer,
+                            })
+                            dbService.doc(`Users/${authService.currentUser.uid}`).update({
+                                server: firebaseInstance.firestore.FieldValue.arrayUnion(serverID)
+                            })
+                        }}>Create</button>
+                    </div>
+                    <div className={i.fcServer}>
+                        <input type="text" placeholder="Server ID" onChange={e => setJoinServer(e.target.value)} />
+                        <button onClick={() => {
+                            dbService.doc(`Servers/${joinServer}`).get().then(doc => {
+                                if (doc.exists) {
+                                    dbService.doc(`Servers/${joinServer}`).update({
+                                        members: firebaseInstance.firestore.FieldValue.arrayUnion(authService.currentUser.uid)
+                                    })
+                                    dbService.doc(`Users/${authService.currentUser.uid}`).update({
+                                        server: firebaseInstance.firestore.FieldValue.arrayUnion(joinServer)
+                                    })
+                                } else {
+                                    alert("Server doesn't exist.")
+                                }
+                            })
+                        }}>Find</button>
+                    </div>
+                    <div id="serverList" className={i.list}></div>
                 </div>
             </div>
         )

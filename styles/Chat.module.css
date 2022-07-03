@@ -45,6 +45,15 @@
     font-size: 60px;
     margin: 30px 0px;
 }
+.servers > :nth-child(2),
+.servers > :nth-child(4) {
+    font-size: x-large;
+    margin-bottom: 0px;
+    margin-top: 0px;
+}
+.servers > :nth-child(4) {
+    margin-top: 20px;
+}
 .findDm {
     width: 100%;
     height: max-content;
@@ -52,7 +61,8 @@
     flex-direction: column;
     align-items: center;
 }
-.newDiv {
+.newDiv,
+.fcServer {
     display: flex;
     flex-direction: row;
     width: 100%;
@@ -61,23 +71,30 @@
     justify-content: center;
     margin-top: 20px;
 }
-.newDiv * {
+.newDiv *,
+.fcServer * {
     border-radius: 100px;
     border: none;
     outline: none;
 }
-.newDiv input {
+.newDiv input,
+.fcServer input {
     width: 300px;
     margin-right: 10px;
     height: 40px;
     padding: 0px 10px;
 }
-.newDiv button {
+.newDiv button,
+.fcServer button {
     width: 100px;
     height: 30px;
     background-color: #5C95FF;
 }
-.findDm h1 {
+.fcServer :nth-last-child(2) {
+    margin-right: 10px;
+}
+.findDm h1,
+.fcServer h1 {
     color: #FF985C;
     font-size: x-large;
 }
