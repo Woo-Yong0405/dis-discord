@@ -26,7 +26,7 @@ export default function chat() {
                         p.innerText = nickname;
                     })
                     button2.addEventListener("click", () => {
-                        Router.push(`/chat/${inn}?type=dm&from=${authService.currentUser.uid}`)
+                        Router.push(`/chat/${inn}?type=dm`)
                     })
                     div.append(p)
                     button.innerText = "Delete Friend"
@@ -60,7 +60,7 @@ export default function chat() {
                         p.innerText = nickname;
                     })
                     button2.addEventListener("click", () => {
-                        Router.push(`/chat/${inn}?type=dm&from=${authService.currentUser.uid}`)
+                        Router.push(`/chat/${inn}?type=dm`)
                     })
                     div.append(p)
                     button.innerText = "Delete Friend"
@@ -93,7 +93,7 @@ export default function chat() {
                         p.innerText = nickname;
                     })
                     button2.addEventListener("click", () => {
-                        Router.push(`/chat/${inn}?type=server&from=${authService.currentUser.uid}`)
+                        Router.push(`/chat/${inn}?type=server`)
                     })
                     div.append(p)
                     button.innerText = "Leave"
@@ -131,7 +131,7 @@ export default function chat() {
                         p.innerText = docca.data().name;
                     })
                     button2.addEventListener("click", () => {
-                        Router.push(`/chat/${inn}?type=server&from=${authService.currentUser.uid}`)
+                        Router.push(`/chat/${inn}?type=server`)
                     })
                     div.append(p)
                     button.innerText = "Leave"
